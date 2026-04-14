@@ -25,7 +25,7 @@
     <!-- App Header -->
     <header class="app-header">
         <div class="user-greeting">
-            <p class="greeting-sub">Welcome back,</p>
+            <p class="greeting-sub">The All-New Kona (SX2)</p>
             <h1 class="greeting-main" id="view-title">Dashboard</h1>
         </div>
         <button class="header-action" onclick="app.refreshDashboard()">
@@ -47,7 +47,11 @@
                     <span id="dash-odo-value">0</span>
                     <span class="unit">km</span>
                 </div>
-                <button class="btn btn-outline glow-effect" onclick="ui.modals.open('modal-odo')">단순 주행거리 통과 기록하기</button>
+                <!-- Fuel Economy Indicator -->
+                <div class="fe-indicator" id="dash-fe-container" style="display:none;">
+                    <span class="material-symbols-rounded">local_gas_station</span> 최근 구간 연비: <strong id="dash-fe-value">-</strong> km/L
+                </div>
+                <button class="btn btn-outline glow-effect" onclick="ui.modals.open('modal-odo')" style="width: 100%; margin-top: 10px;">단순 주행거리 통과 기록하기</button>
             </div>
 
             <!-- Urgent Alerts / Upcoming -->
@@ -55,7 +59,6 @@
                 <h3>정비 알림</h3>
             </div>
             <div class="dashboard-alerts" id="dash-alerts">
-                <!-- Example of empty state or injected alerts -->
                 <div class="empty-state">
                     <span class="material-symbols-rounded">check_circle</span>
                     <p>현재 교체가 시급한 항목이 없습니다.</p>
@@ -65,7 +68,7 @@
             <!-- Quick Stats -->
             <div class="quick-stats-grid">
                 <div class="glass-card stat-card">
-                    <span class="material-symbols-rounded stat-icon highlight-blue">local_gas_station</span>
+                    <span class="material-symbols-rounded stat-icon highlight-blue">event_note</span>
                     <h4>최근 주유</h4>
                     <p id="dash-last-fuel">-</p>
                 </div>
@@ -91,20 +94,46 @@
             </div>
         </section>
 
-        <!-- 3. SETTINGS VIEW -->
+        <!-- 3. STATS VIEW (신규 통계 차트) -->
+        <section id="view-stats" class="view-section">
+            <div class="glass-card">
+                <h3>월별 유지비 지출</h3>
+                <p class="sub-text">단위: 만 원</p>
+                <div class="chart-container" id="chart-monthly-container">
+                    <!-- Bars Injected via JS -->
+                </div>
+            </div>
+            <div class="glass-card" style="margin-top: 24px;">
+                <h3>세부 내역 통계 (전체 기간)</h3>
+                <ul class="stats-list" id="stats-summary-list">
+                    <!-- Summary Lists via JS -->
+                </ul>
+            </div>
+        </section>
+
+        <!-- 4. SETTINGS VIEW -->
         <section id="view-settings" class="view-section">
             <div class="glass-card">
+                <h3>디올뉴코나 SX2 전용 제원표</h3>
+                <p class="sub-text">차량 관리에 필요한 규격을 잊지 마세요.</p>
+                <div class="spec-grid" id="st-specs-container">
+                    <!-- Specs Form Injected via JS -->
+                </div>
+                <button class="btn btn-outline" onclick="app.saveSettings()" style="width: 100%; margin-top: 12px;">제원 메모 저장</button>
+            </div>
+
+            <div class="glass-card" style="margin-top: 24px;">
                 <h3>차량 기본 정보</h3>
                 <div class="input-group">
                     <label>보험 만기일 (갱신일)</label>
                     <input type="date" id="st-insurance-date" class="form-input">
                 </div>
-                <button class="btn btn-primary" onclick="app.saveSettings()" style="width: 100%; margin-top: 12px;">저장하기</button>
+                <button class="btn btn-primary" onclick="app.saveSettings()" style="width: 100%; margin-top: 12px;">설정 저장하기</button>
             </div>
 
             <div class="glass-card danger-zone" style="margin-top: 24px;">
                 <h3>데이터 관리</h3>
-                <p class="sub-text">데이터는 서버가 아닌 기기에만 저장됩니다. 폰을 바꾸기 전 반드시 백업하세요.</p>
+                <p class="sub-text">데이터는 폰에만 저장됩니다! 기기 변경 전 꼭 보관하세요.</p>
                 
                 <button class="btn btn-outline" onclick="app.exportData()" style="width: 100%; margin-bottom: 12px;">
                     <span class="material-symbols-rounded">download</span> 데이터 백업 (파일 다운로드)
@@ -141,9 +170,9 @@
                 </div>
             </button>
             
-            <button class="nav-item disabled-visually"> <!-- visual placeholder purely for layout -->
-                <span class="material-symbols-rounded"></span>
-                <span></span>
+            <button class="nav-item" data-view="view-stats">
+                <span class="material-symbols-rounded">bar_chart</span>
+                <span>통계</span>
             </button>
             
             <button class="nav-item" data-view="view-settings">
@@ -193,7 +222,7 @@
                     
                     <div class="input-group">
                         <label>메모 (선택)</label>
-                        <input type="text" id="input-memo" class="form-input" placeholder="주유소 이름, 세차장 등 메모장">
+                        <input type="text" id="input-memo" class="form-input" placeholder="장소, 부품가격 등 메모">
                     </div>
 
                     <button type="submit" class="btn btn-primary submit-btn">기록 저장하기</button>
@@ -210,7 +239,7 @@
                 <button class="btn-icon" onclick="ui.modals.close('modal-odo')"><span class="material-symbols-rounded">close</span></button>
             </div>
             <div class="modal-body">
-                <p class="sub-text">특별한 정비 없이 단순히 달리기만 했을 때, 주행거리를 갱신하면 소모품 교체 주기를 정확하게 계산할 수 있습니다.</p>
+                <p class="sub-text">특별한 정비 없이 단순히 달리기만 했을 때, 주행거리를 갱신하면 소모품 교체 주기를 보다 정확하게 계산할 수 있습니다.</p>
                 <form onsubmit="app.handleOdoSubmit(event)">
                     <div class="input-group">
                         <label>현재 누적 주행거리 <span class="required">*</span></label>
