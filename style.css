@@ -19,6 +19,10 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+html, body {
+    height: 100%;
+}
+
 body {
     background-color: var(--bg-color);
     color: var(--text-main);
@@ -26,6 +30,8 @@ body {
     line-height: 1.5;
     overscroll-behavior-y: none; /* PWA optimal */
     padding-bottom: calc(90px + env(safe-area-inset-bottom)); /* space for bottom nav + iPhone home bar */
+    min-height: 100vh;
+    min-height: -webkit-fill-available; /* iOS Safari specific 100% height fix */
 }
 
 /* Header */
