@@ -25,7 +25,7 @@ body {
     font-family: var(--font-family);
     line-height: 1.5;
     overscroll-behavior-y: none; /* PWA optimal */
-    padding-bottom: 90px; /* space for bottom nav */
+    padding-bottom: calc(90px + env(safe-area-inset-bottom)); /* space for bottom nav + iPhone home bar */
 }
 
 /* Header */
@@ -33,7 +33,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 24px 24px 10px;
+    padding: calc(20px + env(safe-area-inset-top)) 24px 10px;
     position: sticky;
     top: 0;
     background: var(--bg-color);
