@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="My Car">
+    <meta name="theme-color" content="#F2F2F7">
+    <title>My Car Log</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Using Material Symbols Rounded for premium look -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- App Header -->
+    <header class="app-header">
+        <div class="user-greeting">
+            <p class="greeting-sub">Welcome back,</p>
+            <h1 class="greeting-main" id="view-title">Dashboard</h1>
+        </div>
+        <button class="header-action" onclick="app.refreshDashboard()">
+            <span class="material-symbols-rounded">refresh</span>
+        </button>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="app-content">
+        <!-- 1. DASHBOARD VIEW -->
+        <section id="view-dashboard" class="view-section active">
+            <!-- ODO Card -->
+            <div class="glass-card main-odo-card">
+                <div class="card-header">
+                    <span class="material-symbols-rounded">speed</span>
+                    <h3>총 누적 주행거리</h3>
+                </div>
+                <div class="odo-display">
+                    <span id="dash-odo-value">0</span>
+                    <span class="unit">km</span>
+                </div>
+                <button class="btn btn-outline glow-effect" onclick="ui.modals.open('modal-odo')">단순 주행거리 통과 기록하기</button>
+            </div>
+
+            <!-- Urgent Alerts / Upcoming -->
+            <div class="section-heading">
+                <h3>정비 알림</h3>
+            </div>
+            <div class="dashboard-alerts" id="dash-alerts">
+                <!-- Example of empty state or injected alerts -->
+                <div class="empty-state">
+                    <span class="material-symbols-rounded">check_circle</span>
+                    <p>현재 교체가 시급한 항목이 없습니다.</p>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="quick-stats-grid">
+                <div class="glass-card stat-card">
+                    <span class="material-symbols-rounded stat-icon highlight-blue">local_gas_station</span>
+                    <h4>최근 주유</h4>
+                    <p id="dash-last-fuel">-</p>
+                </div>
+                <div class="glass-card stat-card">
+                    <span class="material-symbols-rounded stat-icon highlight-cyan">local_car_wash</span>
+                    <h4>최근 세차</h4>
+                    <p id="dash-last-wash">-</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. LOGS VIEW -->
+        <section id="view-logs" class="view-section">
+            <div class="pill-nav">
+                <button class="pill-btn active" data-filter="all">전체</button>
+                <button class="pill-btn" data-filter="fuel">주유</button>
+                <button class="pill-btn" data-filter="wash">세차</button>
+                <button class="pill-btn" data-filter="maint">정비</button>
+            </div>
+            
+            <div class="timeline-container" id="logs-timeline">
+                <!-- Log Items Injected via JS -->
+            </div>
+        </section>
+
+        <!-- 3. SETTINGS VIEW -->
+        <section id="view-settings" class="view-section">
+            <div class="glass-card">
+                <h3>차량 기본 정보</h3>
+                <div class="input-group">
+                    <label>보험 만기일 (갱신일)</label>
+                    <input type="date" id="st-insurance-date" class="form-input">
+                </div>
+                <button class="btn btn-primary" onclick="app.saveSettings()" style="width: 100%; margin-top: 12px;">저장하기</button>
+            </div>
+
+            <div class="glass-card danger-zone" style="margin-top: 24px;">
+                <h3>데이터 관리</h3>
+                <p class="sub-text">데이터는 서버가 아닌 기기에만 저장됩니다. 폰을 바꾸기 전 반드시 백업하세요.</p>
+                
+                <button class="btn btn-outline" onclick="app.exportData()" style="width: 100%; margin-bottom: 12px;">
+                    <span class="material-symbols-rounded">download</span> 데이터 백업 (파일 다운로드)
+                </button>
+                
+                <input type="file" id="st-import-file" style="display: none;" accept=".json" onchange="app.importData(event)">
+                <button class="btn btn-outline" onclick="document.getElementById('st-import-file').click()" style="width: 100%; margin-bottom: 24px;">
+                    <span class="material-symbols-rounded">upload</span> 데이터 복원 (파일 불러오기)
+                </button>
+                
+                <button class="btn btn-danger" onclick="app.resetAllData()" style="width: 100%;">
+                    <span class="material-symbols-rounded">delete_forever</span> 전체 데이터 초기화
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+        <div class="nav-links">
+            <button class="nav-item active" data-view="view-dashboard">
+                <span class="material-symbols-rounded">dashboard</span>
+                <span>홈</span>
+            </button>
+            <button class="nav-item" data-view="view-logs">
+                <span class="material-symbols-rounded">receipt_long</span>
+                <span>기록</span>
+            </button>
+            
+            <!-- Floating FAB conceptually embedded in nav -->
+            <button class="nav-fab" onclick="ui.modals.open('modal-add-record')">
+                <div class="fab-inner">
+                    <span class="material-symbols-rounded">add</span>
+                </div>
+            </button>
+            
+            <button class="nav-item disabled-visually"> <!-- visual placeholder purely for layout -->
+                <span class="material-symbols-rounded"></span>
+                <span></span>
+            </button>
+            
+            <button class="nav-item" data-view="view-settings">
+                <span class="material-symbols-rounded">settings</span>
+                <span>설정</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ========= MODALS ========= -->
+    
+    <!-- 1. Add Record Modal -->
+    <div id="modal-add-record" class="modal-overlay">
+        <div class="glass-modal">
+            <div class="modal-header">
+                <h2>새로운 기록 추가</h2>
+                <button class="btn-icon" onclick="ui.modals.close('modal-add-record')"><span class="material-symbols-rounded">close</span></button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Type Selection -->
+                <div class="segmented-control" id="add-record-type">
+                    <button class="segment active" data-val="fuel">주유</button>
+                    <button class="segment" data-val="wash">세차</button>
+                    <button class="segment" data-val="maint">정비</button>
+                </div>
+                
+                <form id="form-add-record" onsubmit="app.handleRecordSubmit(event)">
+                    <!-- Global Fields for all types -->
+                    <div class="input-group">
+                        <label>날짜 <span class="required">*</span></label>
+                        <input type="date" id="input-date" class="form-input" required>
+                    </div>
+                    
+                    <!-- Dynamic Fields Container -->
+                    <div id="dynamic-form-fields">
+                        <!-- Filled by JS -->
+                    </div>
+
+                    <div class="input-group" id="group-odo">
+                        <label>기준 누적 주행거리 (ODO) <span class="required">*</span></label>
+                        <div class="input-with-suffix">
+                            <input type="number" id="input-odo" class="form-input" required placeholder="예: 15300">
+                            <span class="suffix">km</span>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>메모 (선택)</label>
+                        <input type="text" id="input-memo" class="form-input" placeholder="주유소 이름, 세차장 등 메모장">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary submit-btn">기록 저장하기</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Add Simple ODO Modal -->
+    <div id="modal-odo" class="modal-overlay">
+        <div class="glass-modal tight-modal">
+            <div class="modal-header">
+                <h2>주행거리 갱신</h2>
+                <button class="btn-icon" onclick="ui.modals.close('modal-odo')"><span class="material-symbols-rounded">close</span></button>
+            </div>
+            <div class="modal-body">
+                <p class="sub-text">특별한 정비 없이 단순히 달리기만 했을 때, 주행거리를 갱신하면 소모품 교체 주기를 정확하게 계산할 수 있습니다.</p>
+                <form onsubmit="app.handleOdoSubmit(event)">
+                    <div class="input-group">
+                        <label>현재 누적 주행거리 <span class="required">*</span></label>
+                        <div class="input-with-suffix">
+                            <input type="number" id="input-simple-odo" class="form-input" required>
+                            <span class="suffix">km</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary submit-btn">갱신하기</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
