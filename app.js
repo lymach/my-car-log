@@ -7,8 +7,8 @@ const defaultData = {
         insuranceDate: '',
         specs: {
             wiper: '운전석 650mm / 조수석 400mm',
-            oil: '1.6터보 4.8L / 2.0가솔린 4.0L / 하이브리드 3.8L (0W-20)',
-            tireSize: '215/60 R17 또는 235/45 R19',
+            oil: '1.6 터보 전용 4.8L (초저점도 0W-20)',
+            tireSize: '215/60 R17',
             tirePress: '전후륜 36 psi (승차감)~ 38 psi (연비)',
             filter: '코나 SX2 전용 규격'
         }
@@ -17,7 +17,13 @@ const defaultData = {
 
 let carData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultData;
 if (!carData.logs) carData.logs = [];
-if (!carData.settings.specs) carData.settings.specs = defaultData.settings.specs; // Migration for existing users
+if (!carData.settings.specs) {
+    carData.settings.specs = defaultData.settings.specs; // Migration for existing users
+} else {
+    // Force specific requested updates for existing users
+    carData.settings.specs.oil = '1.6 터보 전용 4.8L (초저점도 0W-20)';
+    carData.settings.specs.tireSize = '215/60 R17';
+}
 
 const app = {
     init() {
