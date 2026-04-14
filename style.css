@@ -93,7 +93,10 @@ body {
 }
 .empty-state span { font-size: 32px; opacity: 0.5; }
 
-/* Dashboard Grid */
+/* Dashboard Grid & Fuel Economy */
+.fe-indicator { background: var(--nav-bg); padding: 10px 16px; border-radius: 12px; font-size: 14px; color: var(--text-main); margin-bottom: 20px; display: flex; align-items: center; gap: 6px; font-weight: 500;}
+.fe-indicator strong { font-size: 18px; color: var(--accent-blue);}
+
 .quick-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .stat-card { padding: 20px; display: flex; flex-direction: column; gap: 8px; }
 .stat-icon { font-size: 28px; margin-bottom: 8px; }
@@ -194,3 +197,19 @@ body {
 .alert-item.warning { background: #FFF9E6; border-color: #FFE082; }
 .alert-item.warning .alert-icon { color: #FF9F0A; }
 .alert-item.warning .alert-content h4 { color: #FF9F0A; }
+
+/* Chart Area */
+.chart-container {
+    display: flex; justify-content: space-around; align-items: flex-end; 
+    height: 180px; margin-top: 20px; border-bottom: 2px solid var(--card-border);
+    padding-bottom: 8px;
+}
+.chart-bar-group { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 40px;}
+.chart-bar { width: 30px; height: 120px; background: rgba(0,0,0,0.03); border-radius: 6px; position: relative; overflow: hidden; display:flex; align-items:flex-end;}
+.chart-fill { width: 100%; background: var(--accent-blue); border-radius: 6px; transition: height 0.5s ease-out; }
+.chart-val { font-size: 11px; font-weight: 600; color: var(--text-main); }
+.chart-label { font-size: 12px; color: var(--text-sub); }
+
+.stats-list { list-style: none; padding: 0; }
+.stats-list li { border-bottom: 1px solid var(--card-border); padding: 12px 0; }
+.stats-list li:last-child { border-bottom: none; }
